@@ -29,29 +29,36 @@ export default function MarketingPage() {
   const [loading,     setLoading]     = useState(true)
 
   async function loadData() {
-    const supabase = createClient()
+  const supabase = createClient()
+  await supabase.auth.refreshSession()
 
-    const [{ data: enquiries }, { data: subscribers }, { data: cams }] = await Promise.all([
-      supabase.from('enquiries').select('email, name').order('created_at', { ascending: false }),
-      supabase.from('subscribers').select('email, name').order('created_at', { ascending: false }),
-      supabase.from('email_campaigns').select('*').order('sent_at', { ascending: false }).limit(20),
-    ])
-
-    // Merge and deduplicate
-    const seen   = new Set<string>()
-    const merged: Recipient[] = []
-
-    for (const e of [...(enquiries || []), ...(subscribers || [])]) {
-      if (!e.email || seen.has(e.email)) continue
-      seen.add(e.email)
-      merged.push({ email: e.email, name: e.name || '' })
-    }
-
-    setRecipients(merged)
-    setSelected(merged.map(r => r.email))
-    setCampaigns((cams as Campaign[]) || [])
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) {
+    console.error('No session on marketing page')
     setLoading(false)
+    return
   }
+
+  const [{ data: enquiries }, { data: subscribers }, { data: cams }] = await Promise.all([
+    supabase.from('enquiries').select('email, name').order('created_at', { ascending: false }),
+    supabase.from('subscribers').select('email, name').order('created_at', { ascending: false }),
+    supabase.from('email_campaigns').select('*').order('sent_at', { ascending: false }).limit(20),
+  ])
+
+  const seen   = new Set<string>()
+  const merged: Recipient[] = []
+  for (const e of [...(enquiries || []), ...(subscribers || [])]) {
+    if (!e.email || seen.has(e.email)) continue
+    seen.add(e.email)
+    merged.push({ email: e.email, name: e.name || '' })
+  }
+
+  setRecipients(merged)
+  setSelected(merged.map(r => r.email))
+  setAllSelected(true)
+  setCampaigns((cams as Campaign[]) || [])
+  setLoading(false)
+}
 
   useEffect(() => { loadData() }, [])
 
