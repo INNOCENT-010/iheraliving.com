@@ -1,0 +1,303 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Font variables ── */
+:root {
+  --font-cormorant: 'Cormorant', serif;
+  --font-jost:      'Jost', sans-serif;
+  --font-dm-mono:   'DM Mono', monospace;
+}
+
+/* ── DARK MODE (default) ── */
+:root,
+[data-theme='dark'] {
+  --bg:              #0d0d0d;
+  --bg-soft:         #1a1a1a;
+  --bg-card:         #111111;
+  --border:          rgba(184,146,74,0.12);
+  --border-soft:     rgba(58,58,58,0.8);
+  --text:            #f5f0e8;
+  --text-muted:      rgba(245,240,232,0.55);
+  --text-faint:      rgba(245,240,232,0.22);
+  --brass:           #b8924a;
+  --brass-light:     #d4a85c;
+  --brass-dark:      #8a6a30;
+  --brass-ghost:     rgba(184,146,74,0.04);
+  --overlay:         rgba(13,13,13,0.52);
+  --overlay-img:     rgba(13,13,13,0.80);
+  --scrollbar-thumb: #3a3a3a;
+}
+
+/* ── LIGHT MODE ── */
+[data-theme='light'] {
+  --bg:              #faf7f2;
+  --bg-soft:         #f0ebe2;
+  --bg-card:         #e5dfd4;
+  --border:          rgba(26,22,14,0.10);
+  --border-soft:     rgba(26,22,14,0.16);
+  --text:            #0a0805;
+  --text-muted:      #1e1a10;
+  --text-faint:      #4a3f28;
+  --brass:           #6b4f18;
+  --brass-light:     #8a6520;
+  --brass-dark:      #4a3410;
+  --brass-ghost:     rgba(107,79,24,0.07);
+  --overlay:         rgba(14,12,8,0.48);
+  --overlay-img:     rgba(14,12,8,0.72);
+  --scrollbar-thumb: #c8c0b4;
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  padding:    0;
+  margin:     0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color:          var(--bg);
+  color:                     var(--text);
+  font-family:               var(--font-jost);
+  font-weight:               300;
+  -webkit-font-smoothing:    antialiased;
+  -moz-osx-font-smoothing:   grayscale;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* ── Light mode stronger text ── */
+[data-theme='light'] body {
+  font-weight: 400;
+}
+
+[data-theme='light'] p,
+[data-theme='light'] span,
+[data-theme='light'] a,
+[data-theme='light'] li {
+  font-weight: 400;
+}
+
+[data-theme='light'] .font-display {
+  font-weight: 500;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 2px; }
+
+/* ── Selection ── */
+::selection {
+  background-color: var(--brass);
+  color:            var(--bg);
+}
+
+/* ── Utilities ── */
+.brass-line {
+  display:          block;
+  width:            40px;
+  height:           1px;
+  background-color: var(--brass);
+}
+
+.bg-theme        { background-color: var(--bg); }
+.bg-theme-soft   { background-color: var(--bg-soft); }
+.bg-theme-card   { background-color: var(--bg-card); }
+.text-theme      { color: var(--text); }
+.text-muted-cls  { color: var(--text-muted); }
+.text-faint-cls  { color: var(--text-faint); }
+.border-theme    { border-color: var(--border); }
+.text-brass-theme { color: var(--brass); }
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slowZoom {
+  from { transform: scale(1); }
+  to   { transform: scale(1.08); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.page-enter       { animation: fadeUp 0.6s cubic-bezier(0.25,0.1,0.25,1) forwards; }
+.animate-slow-zoom { animation: slowZoom 20s ease infinite alternate; }
+.animate-pulse    { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+
+/* ── Grain overlay ── */
+.grain::before {
+  content:    '';
+  position:   fixed;
+  inset:      0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index:    9999;
+  opacity:    0.3;
+}
+
+/* ════════════════════════════════
+   ADMIN — always dark, never themed
+   ════════════════════════════════ */
+.admin-dark,
+.admin-dark * {
+  --bg:          #0d0d0d !important;
+  --bg-soft:     #1a1a1a !important;
+  --bg-card:     #2a2a2a !important;
+  --border:      rgba(184,146,74,0.12) !important;
+  --border-soft: rgba(58,58,58,0.8) !important;
+  --text:        #f5f0e8 !important;
+  --text-muted:  rgba(245,240,232,0.55) !important;
+  --text-faint:  rgba(245,240,232,0.22) !important;
+  --brass:       #b8924a !important;
+  --brass-light: #d4a85c !important;
+  --brass-ghost: rgba(184,146,74,0.04) !important;
+}
+
+.admin-dark {
+  background-color: #0d0d0d !important;
+  color:            #f5f0e8 !important;
+}
+
+.admin-sidebar {
+  background:   #111111;
+  border-right: 1px solid rgba(184,146,74,0.12);
+}
+
+/* ── Admin form elements ── */
+.admin-label {
+  font-family:     var(--font-jost);
+  font-size:       9px;
+  letter-spacing:  0.2em;
+  text-transform:  uppercase;
+  color:           rgba(245,240,232,0.4);
+  display:         block;
+}
+
+.admin-input {
+  background:    transparent;
+  border-bottom: 1px solid #3a3a3a;
+  padding:       10px 0;
+  font-family:   var(--font-jost);
+  font-size:     13px;
+  color:         #f5f0e8;
+  transition:    border-color 0.3s;
+  outline:       none;
+  width:         100%;
+}
+
+.admin-input:focus        { border-bottom-color: rgba(184,146,74,0.6); }
+.admin-input::placeholder { color: rgba(245,240,232,0.18); }
+
+select.admin-input {
+  background: #1a1a1a;
+  border:     1px solid #3a3a3a;
+  padding:    10px 8px;
+  color:      #f5f0e8;
+}
+
+.admin-btn-primary {
+  background:      #b8924a;
+  color:           #0d0d0d;
+  font-family:     var(--font-jost);
+  font-size:       10px;
+  letter-spacing:  0.2em;
+  text-transform:  uppercase;
+  padding:         14px 32px;
+  transition:      background 0.3s;
+  cursor:          pointer;
+  border:          none;
+  display:         inline-block;
+}
+
+.admin-btn-primary:hover    { background: #d4a85c; }
+.admin-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.admin-btn-outline {
+  border:          1px solid rgba(184,146,74,0.3);
+  color:           rgba(184,146,74,0.7);
+  font-family:     var(--font-jost);
+  font-size:       10px;
+  letter-spacing:  0.2em;
+  text-transform:  uppercase;
+  padding:         14px 32px;
+  transition:      all 0.3s;
+  cursor:          pointer;
+  background:      transparent;
+  display:         inline-block;
+}
+
+.admin-btn-outline:hover {
+  border-color: #b8924a;
+  color:        #b8924a;
+}
+
+/* ── Journal editor (admin) ── */
+.journal-editor-content {
+  color:       rgba(245,240,232,0.8);
+  font-family: var(--font-jost);
+  font-size:   14px;
+  line-height: 1.9;
+}
+
+.journal-editor-content h2 {
+  font-family: var(--font-cormorant);
+  font-size:   1.6rem;
+  color:       #f5f0e8;
+  margin:      1.5rem 0 0.8rem;
+}
+
+.journal-editor-content p           { margin-bottom: 1rem; }
+.journal-editor-content strong      { color: #f5f0e8; font-weight: 500; }
+.journal-editor-content ul          { padding-left: 1.5rem; margin-bottom: 1rem; list-style: disc; }
+.journal-editor-content blockquote  {
+  border-left:  2px solid #b8924a;
+  padding-left: 1.2rem;
+  margin:       1.5rem 0;
+  font-style:   italic;
+  color:        rgba(245,240,232,0.6);
+}
+.journal-editor-content img { max-width: 100%; height: auto; margin: 1.5rem 0; }
+.journal-editor-content hr  { border: none; border-top: 1px solid rgba(184,146,74,0.2); margin: 2rem 0; }
+
+/* ── Journal content (public site) ── */
+.journal-content h2 {
+  font-family: var(--font-cormorant);
+  font-size:   1.8rem;
+  color:       var(--text);
+  margin:      2.5rem 0 1rem;
+  line-height: 1.2;
+}
+
+.journal-content h3 {
+  font-family: var(--font-cormorant);
+  font-size:   1.4rem;
+  color:       var(--text);
+  margin:      2rem 0 0.8rem;
+}
+
+.journal-content p {
+  margin-bottom: 1.4rem;
+  line-height:   1.9;
+  color:         var(--text-muted);
+}
+
+.journal-content blockquote {
+  border-left:  2px solid var(--brass);
+  padding-left: 1.5rem;
+  margin:       2rem 0;
+  font-family:  var(--font-cormorant);
+  font-size:    1.3rem;
+  font-style:   italic;
+  color:        var(--text-muted);
+}
