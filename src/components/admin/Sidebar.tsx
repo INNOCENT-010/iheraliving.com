@@ -5,15 +5,9 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils/cn'
 import {
-  LayoutDashboard,
-  Package,
-  BookOpen,
-  BarChart3,
-  Settings,
-  LogOut,
-  Mail,
-  FileText,
-  Send,
+  LayoutDashboard, Package, BookOpen,
+  BarChart3, Settings, LogOut,
+  Mail, FileText, Send, X,
 } from 'lucide-react'
 
 const navItems = [
@@ -27,7 +21,11 @@ const navItems = [
   { href: '/admin/settings',  icon: Settings,        label: 'Settings'   },
 ]
 
-export default function AdminSidebar() {
+interface Props {
+  onNavigate?: () => void
+}
+
+export default function AdminSidebar({ onNavigate }: Props) {
   const pathname = usePathname()
   const router   = useRouter()
 
@@ -39,38 +37,48 @@ export default function AdminSidebar() {
 
   return (
     <aside
-      className="admin-sidebar w-56 h-screen sticky top-0 flex flex-col shrink-0"
-      style={{ backgroundColor: '#111111' }}
+      className="w-56 h-full flex flex-col shrink-0"
+      style={{ backgroundColor: '#111111', borderRight: '1px solid rgba(184,146,74,0.12)' }}
     >
-      {/* Logo */}
+      {/* Logo + close on mobile */}
       <div
-        className="px-6 py-7 border-b"
+        className="flex items-center justify-between px-6 py-7 border-b"
         style={{ borderColor: 'rgba(184,146,74,0.12)' }}
       >
-        <p
-          className="font-display text-lg tracking-widest"
-          style={{ color: '#f5f0e8' }}
-        >
-          IHE&apos;RA
-        </p>
-        <p
-          className="font-body text-[8px] tracking-widest uppercase mt-0.5"
-          style={{ color: 'rgba(184,146,74,0.6)' }}
-        >
-          Admin
-        </p>
+        <div>
+          <p className="font-display text-lg tracking-widest" style={{ color: '#f5f0e8' }}>
+            IHE&apos;RA
+          </p>
+          <p
+            className="font-body text-[8px] tracking-widest uppercase mt-0.5"
+            style={{ color: 'rgba(184,146,74,0.6)' }}
+          >
+            Admin
+          </p>
+        </div>
+        {onNavigate && (
+          <button
+            onClick={onNavigate}
+            className="lg:hidden p-1"
+            style={{ color: 'rgba(245,240,232,0.3)' }}
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-5 flex flex-col gap-0.5 overflow-y-auto">
         {navItems.map(({ href, icon: Icon, label }) => {
-          const active = pathname === href || (href !== '/admin' && pathname.startsWith(href))
+          const active = pathname === href ||
+            (href !== '/admin' && pathname.startsWith(href))
           return (
             <Link
               key={href}
               href={href}
+              onClick={onNavigate}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 transition-all duration-200 font-body text-xs tracking-wider'
+                'flex items-center gap-3 px-3 py-3 transition-all duration-200 font-body text-xs tracking-wider'
               )}
               style={{
                 backgroundColor: active ? 'rgba(184,146,74,0.12)' : 'transparent',
