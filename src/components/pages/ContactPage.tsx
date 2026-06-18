@@ -8,7 +8,6 @@ import toast from 'react-hot-toast'
 function ContactForm() {
   const searchParams = useSearchParams()
   const productName  = searchParams.get('product') || ''
-  const productSlug  = searchParams.get('slug')    || ''
 
   const [form, setForm] = useState({
     name:    '',
@@ -19,7 +18,6 @@ function ContactForm() {
   const [loading, setLoading] = useState(false)
   const [sent,    setSent]    = useState(false)
 
-  // Pre-fill message if product is specified
   useEffect(() => {
     if (productName) {
       setForm(prev => ({
@@ -35,42 +33,53 @@ function ContactForm() {
       return
     }
     setLoading(true)
-    const supabase = createClient()
 
-    const { data: enquiry, error } = await supabase
-      .from('enquiries')
-      .insert([{
-        ...form,
-        product_ref: productSlug || null,
-      }])
-      .select()
-      .single()
+    try {
+      const supabase = createClient()
 
-    if (error) {
+      const { data: enquiry, error } = await supabase
+        .from('enquiries')
+        .insert([{
+          name:    form.name,
+          email:   form.email,
+          phone:   form.phone || null,
+          message: form.message,
+        }])
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Enquiry error:', error.message)
+        toast.error(`Could not submit: ${error.message}`)
+        return
+      }
+
+      // Fire emails non-blocking
+      if (enquiry?.id) {
+        fetch('/api/email', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ type: 'enquiry_notify', enquiryId: enquiry.id }),
+        }).catch(console.error)
+
+        fetch('/api/email', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            type:        'enquiry_confirm',
+            clientEmail: form.email,
+            clientName:  form.name,
+          }),
+        }).catch(console.error)
+      }
+
+      setSent(true)
+    } catch (err) {
+      console.error('Submit exception:', err)
       toast.error('Something went wrong. Please try again.')
+    } finally {
       setLoading(false)
-      return
     }
-
-    // Fire emails non-blocking
-    fetch('/api/email', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ type: 'enquiry_notify', enquiryId: enquiry.id }),
-    }).catch(console.error)
-
-    fetch('/api/email', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        type:        'enquiry_confirm',
-        clientEmail: form.email,
-        clientName:  form.name,
-      }),
-    }).catch(console.error)
-
-    setSent(true)
-    setLoading(false)
   }
 
   if (sent) return (
@@ -116,7 +125,10 @@ function ContactForm() {
               >
                 Product Enquiry
               </p>
-              <h1 className="font-display text-4xl md:text-5xl" style={{ color: 'var(--text)' }}>
+              <h1
+                className="font-display text-4xl md:text-5xl"
+                style={{ color: 'var(--text)' }}
+              >
                 {productName}
               </h1>
               <p
@@ -134,7 +146,10 @@ function ContactForm() {
               >
                 Get in Touch
               </p>
-              <h1 className="font-display text-4xl md:text-5xl" style={{ color: 'var(--text)' }}>
+              <h1
+                className="font-display text-4xl md:text-5xl"
+                style={{ color: 'var(--text)' }}
+              >
                 Contact
               </h1>
             </>
@@ -147,9 +162,9 @@ function ContactForm() {
           <div className="flex flex-col justify-between gap-12">
             <div className="flex flex-col gap-8">
               {[
-                { label: 'Email',     value: 'hello@ihera.com',    href: 'mailto:hello@ihera.com'             },
-                { label: 'Instagram', value: '@ihera.living',      href: 'https://instagram.com/ihera.living' },
-                { label: 'WhatsApp',  value: 'Chat with us',       href: 'https://wa.me/2348104945035'        },
+                { label: 'Email',     value: 'iheraliving@gmail.com', href: 'mailto:iheraliving@gmail.com'    },
+                { label: 'Instagram', value: '@iheraliving',          href: 'https://instagram.com/iheraliving' },
+                { label: 'WhatsApp',  value: 'Chat with us',          href: 'https://wa.me/2349039463077'       },
               ].map(({ label, value, href }) => (
                 <a
                   key={label}

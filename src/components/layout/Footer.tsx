@@ -17,7 +17,7 @@ const NAV = [
 export default function Footer({ settings }: FooterProps) {
   const instagram = settings.contact_instagram || 'https://instagram.com'
   const whatsapp  = settings.contact_whatsapp  || 'https://wa.me/234'
-  const email     = settings.contact_email     || 'hello@ihera.com'
+  const email     = settings.contact_email     || 'a.com'
   const statement = settings.brand_statement   || 'Curated Living.'
 
   return (

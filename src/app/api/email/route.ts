@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
-const FROM_EMAIL     = process.env.RESEND_FROM_EMAIL || "IHE'RA <hello@ihera.com>"
+const FROM_EMAIL     = process.env.RESEND_FROM_EMAIL || "IHE'RA <iheraliving@gmail.com>"
 const ADMIN_EMAIL    = process.env.ADMIN_EMAIL        || 'admin@ihera.com'
 const SITE_URL       = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
