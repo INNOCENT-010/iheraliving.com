@@ -7,9 +7,10 @@ export default function PageTracker() {
   const pathname = usePathname()
 
   useEffect(() => {
-    // Don't track admin pages
     if (pathname.startsWith('/admin')) return
     if (pathname.startsWith('/auth'))  return
+
+    console.log('Tracking page view:', pathname)
 
     fetch('/api/pageview', {
       method:  'POST',
@@ -18,7 +19,10 @@ export default function PageTracker() {
         path:     pathname,
         referrer: document.referrer || null,
       }),
-    }).catch(() => { /* silent fail */ })
+    })
+    .then(res => res.json())
+    .then(data => console.log('Page view response:', data))
+    .catch(err => console.error('Page view fetch error:', err))
   }, [pathname])
 
   return null
