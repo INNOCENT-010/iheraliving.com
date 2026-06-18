@@ -15,15 +15,30 @@ export default function LoginPage() {
     if (!email || !password) return
     setLoading(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
     if (error) {
       toast.error(error.message)
       setLoading(false)
-    } else {
-      router.push('/admin')
-      router.refresh()
+      return
     }
-    setLoading(false)
+
+    // Explicitly persist the session so the cookie is set before navigation
+    if (data.session) {
+      await supabase.auth.setSession({
+        access_token:  data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      })
+    }
+
+    // refresh() forces middleware to re-run and pick up the new session cookie
+    router.refresh()
+
+    // Small delay to let the cookie propagate before navigating
+    await new Promise(resolve => setTimeout(resolve, 200))
+
+    router.push('/admin')
   }
 
   return (
@@ -69,10 +84,7 @@ export default function LoginPage() {
               onKeyDown={e => e.key === 'Enter' && handleLogin()}
               autoComplete="email"
               className="w-full bg-transparent py-3 font-body text-sm focus:outline-none transition-colors border-b"
-              style={{
-                borderColor: 'rgba(58,58,58,0.8)',
-                color:       '#f5f0e8',
-              }}
+              style={{ borderColor: 'rgba(58,58,58,0.8)', color: '#f5f0e8' }}
             />
           </div>
 
@@ -91,10 +103,7 @@ export default function LoginPage() {
               onKeyDown={e => e.key === 'Enter' && handleLogin()}
               autoComplete="current-password"
               className="w-full bg-transparent py-3 font-body text-sm focus:outline-none transition-colors border-b"
-              style={{
-                borderColor: 'rgba(58,58,58,0.8)',
-                color:       '#f5f0e8',
-              }}
+              style={{ borderColor: 'rgba(58,58,58,0.8)', color: '#f5f0e8' }}
             />
           </div>
 
@@ -102,11 +111,8 @@ export default function LoginPage() {
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="mt-2 font-body text-[11px] tracking-widest uppercase py-4 transition-colors disabled:opacity-50"
-            style={{
-              backgroundColor: '#b8924a',
-              color:           '#0d0d0d',
-            }}
+            className="mt-2 font-body text-[11px] tracking-widest uppercase py-4 transition-opacity disabled:opacity-50 hover:opacity-80"
+            style={{ backgroundColor: '#b8924a', color: '#0d0d0d' }}
           >
             {loading ? 'Signing in…' : 'Sign In'}
           </button>
