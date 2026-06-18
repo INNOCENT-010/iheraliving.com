@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Package, BookOpen, Mail, Eye } from 'lucide-react'
-
+export const dynamic   = 'force-dynamic'
+export const revalidate = 0
 export default async function AdminDashboard() {
   const supabase = await createClient()
 

@@ -1,6 +1,8 @@
+
 import { createClient } from '@/lib/supabase/server'
 import { BarChart3, Eye, TrendingUp, Users } from 'lucide-react'
-
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 interface PageStat {
   path:  string
   views: number
