@@ -47,13 +47,20 @@ function brandedEmail(body: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
   const body = await req.json()
   const { type } = body
+
+  // enquiry_reply and enquiry_confirm come from both admin and public
+  // so we check auth only for admin-only types
+  const adminOnlyTypes = ['marketing']
+
+  if (adminOnlyTypes.includes(type)) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const supabase = await createClient()
 
   try {
 
@@ -127,8 +134,52 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true })
     }
 
+    // ── Enquiry reply from admin dashboard ──
+    if (type === 'enquiry_reply') {
+      const { clientEmail, clientName, replyMessage, enquiryId } = body
+      if (!clientEmail || !replyMessage) {
+        return NextResponse.json({ error: 'Missing clientEmail or replyMessage' }, { status: 400 })
+      }
+
+      await sendEmail(
+        clientEmail,
+        `Re: Your IHE'RA Enquiry`,
+        brandedEmail(`
+          <p style="font-size:15px;line-height:1.8;color:rgba(245,240,232,0.85);margin:0 0 16px;">
+            Dear ${clientName || 'there'},
+          </p>
+          <div style="margin:24px 0;padding:24px 28px;border-left:2px solid #b8924a;background:rgba(184,146,74,0.06);">
+            <p style="font-size:14px;line-height:1.9;color:rgba(245,240,232,0.8);margin:0;white-space:pre-wrap;">${replyMessage}</p>
+          </div>
+          <p style="font-size:14px;line-height:1.8;color:rgba(245,240,232,0.5);margin:24px 0 0;">
+            Warm regards,<br/>
+            <span style="color:#b8924a;">IHE'RA Team</span>
+          </p>
+          <div style="margin-top:32px;">
+            <a href="${SITE_URL}/collection" style="display:inline-block;background:#b8924a;color:#0d0d0d;padding:14px 32px;font-size:10px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;">
+              Explore Collection
+            </a>
+          </div>
+        `)
+      )
+
+      // Mark as replied in DB
+      if (enquiryId) {
+        await supabase
+          .from('enquiries')
+          .update({
+            status:     'replied',
+            email_sent: true,
+          })
+          .eq('id', enquiryId)
+      }
+
+      return NextResponse.json({ ok: true })
+    }
+
     // ── Marketing campaign ──
     if (type === 'marketing') {
+      const { data: { user } } = await supabase.auth.getUser()
       const { subject, message, recipients } = body
       if (!subject || !message || !recipients?.length) {
         return NextResponse.json({ error: 'Missing subject, message or recipients' }, { status: 400 })
@@ -166,7 +217,7 @@ export async function POST(req: NextRequest) {
         message,
         recipient_count: sent,
         sent_at:         new Date().toISOString(),
-        sent_by:         user.id,
+        sent_by:         user?.id,
       })
 
       const mock = !RESEND_API_KEY

@@ -2,17 +2,17 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: {
-    default: "IHE'RA — Curated Living",
-    template: "%s | IHE'RA",
+  title:       "IHE'RA — Curated Living",
+  description: "IHE'RA is a design-led living brand focused on architectural surfaces, lighting, and curated objects that bring depth, warmth, and intention to every space.",
+  keywords:    ['interior design', 'architectural surfaces', 'luxury living', 'Nigeria', 'Lagos'],
+  icons: {
+    icon:  '/favicon.svg',
+    apple: '/favicon.svg',
   },
-  description:
-    "IHE'RA is a design-led living brand focused on architectural surfaces, lighting, and curated objects that bring depth, warmth, and intention to every space.",
-  keywords: ['interior design', 'architectural surfaces', 'luxury living', 'Nigeria', 'Lagos'],
   openGraph: {
-    title: "IHE'RA — Curated Living",
+    title:       "IHE'RA — Curated Living",
     description: 'Architectural surfaces, lighting, and curated objects.',
-    type: 'website',
+    type:        'website',
   },
 }
 
@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Prevent flash of wrong theme */}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

@@ -91,17 +91,7 @@ export interface ProductJournal {
   created_at: string
 }
 
-export interface Enquiry {
-  id:         string
-  name:       string
-  email:      string
-  phone:      string | null
-  message:    string
-  product_id: string | null
-  status:     EnquiryStatus
-  created_at: string
-  product?:   Product
-}
+
 
 export interface PageView {
   id:         string
@@ -115,4 +105,17 @@ export interface SiteSetting {
   key:        string
   value:      unknown
   updated_at: string
+}
+export interface Enquiry {
+  id:            string
+  name:          string
+  email:         string
+  phone:         string | null
+  message:       string
+  product_id:    string | null
+  status:        'new' | 'read' | 'replied' | 'archived'
+  email_sent:    boolean
+  reply_message: string | null
+  replied_at:    string | null
+  created_at:    string
 }
