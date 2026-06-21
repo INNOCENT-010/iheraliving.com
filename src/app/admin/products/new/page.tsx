@@ -419,7 +419,7 @@ export default function NewProductPage() {
     if (!session) {
       toast.error('Session expired. Please sign in again.')
       setPublishing(false)
-      router.push('/auth/login')
+      router.push('/login')
       return
     }
 
