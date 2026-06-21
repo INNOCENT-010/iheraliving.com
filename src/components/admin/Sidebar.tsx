@@ -30,10 +30,11 @@ export default function AdminSidebar({ onNavigate }: Props) {
   const router   = useRouter()
 
   async function handleLogout() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
+  const supabase = createClient()
+  await supabase.auth.signOut({ scope: 'local' })
+  router.refresh()
+  router.push('/login')
+}
 
   return (
     <aside

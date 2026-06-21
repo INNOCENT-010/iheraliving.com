@@ -35,12 +35,26 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // getUser validates server-side — more reliable than getSession
+  const { data: { user }, error } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (error || !user) {
+    // Clear any stale cookies before redirecting
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    return NextResponse.redirect(url)
+    const redirectResponse = NextResponse.redirect(url)
+
+    // Clear Supabase auth cookies
+    request.cookies.getAll().forEach(cookie => {
+      if (
+        cookie.name.includes('supabase') ||
+        cookie.name.includes('sb-')
+      ) {
+        redirectResponse.cookies.delete(cookie.name)
+      }
+    })
+
+    return redirectResponse
   }
 
   return supabaseResponse
