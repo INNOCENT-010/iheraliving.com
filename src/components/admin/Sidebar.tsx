@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils/cn'
 import {
@@ -27,14 +27,22 @@ interface Props {
 
 export default function AdminSidebar({ onNavigate }: Props) {
   const pathname = usePathname()
-  const router   = useRouter()
 
   async function handleLogout() {
-  const supabase = createClient()
-  await supabase.auth.signOut({ scope: 'local' })
-  router.refresh()
-  router.push('/login')
-}
+    try {
+      // 1. Sign out on client side first to clear local session
+      const supabase = createClient()
+      await supabase.auth.signOut()
+
+      // 2. Call server route to clear cookies
+      await fetch('/api/auth/signout', { method: 'POST' })
+    } catch (err) {
+      console.error('Logout error:', err)
+    } finally {
+      // 3. Force full reload — clears all state, no going back
+      window.location.replace('/login')
+    }
+  }
 
   return (
     <aside
@@ -71,7 +79,8 @@ export default function AdminSidebar({ onNavigate }: Props) {
       {/* Nav */}
       <nav className="flex-1 px-3 py-5 flex flex-col gap-0.5 overflow-y-auto">
         {navItems.map(({ href, icon: Icon, label }) => {
-          const active = pathname === href ||
+          const active =
+            pathname === href ||
             (href !== '/admin' && pathname.startsWith(href))
           return (
             <Link
@@ -100,7 +109,7 @@ export default function AdminSidebar({ onNavigate }: Props) {
       >
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 w-full font-body text-xs tracking-wider transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 w-full font-body text-xs tracking-wider transition-colors hover:opacity-60"
           style={{ color: 'rgba(245,240,232,0.22)' }}
         >
           <LogOut size={14} />
