@@ -19,7 +19,7 @@ export default function ProductCard({ product, className = '' }: Props) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Image — fixed ratio, never full screen */}
+      {/* Image */}
       <div
         className="relative overflow-hidden w-full"
         style={{
@@ -40,10 +40,7 @@ export default function ProductCard({ product, className = '' }: Props) {
             className="absolute inset-0 flex items-center justify-center"
             style={{ backgroundColor: 'var(--bg-card)' }}
           >
-            <span
-              className="font-display text-2xl"
-              style={{ color: 'var(--text-faint)' }}
-            >
+            <span className="font-display text-2xl" style={{ color: 'var(--text-faint)' }}>
               IHE&apos;RA
             </span>
           </div>
@@ -60,9 +57,38 @@ export default function ProductCard({ product, className = '' }: Props) {
           </div>
         )}
 
-        {/* Hover line */}
+        {/* Mobile tap hint — shows on touch devices, hidden on hover */}
         <div
-          className="absolute bottom-0 left-0 h-px transition-all duration-500"
+          className="absolute inset-0 flex items-end justify-end p-3 md:hidden"
+          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)' }}
+        >
+          <span
+            className="font-body text-[8px] tracking-widest uppercase px-2.5 py-1.5"
+            style={{ backgroundColor: 'rgba(184,146,74,0.9)', color: '#0d0d0d' }}
+          >
+            View →
+          </span>
+        </div>
+
+        {/* Desktop hover overlay */}
+        <div
+          className="absolute inset-0 hidden md:flex items-center justify-center transition-opacity duration-300"
+          style={{
+            backgroundColor: 'rgba(0,0,0,0.35)',
+            opacity:         hovered ? 1 : 0,
+          }}
+        >
+          <span
+            className="font-body text-[9px] tracking-widest uppercase px-5 py-2.5 border"
+            style={{ borderColor: 'rgba(245,240,232,0.6)', color: '#f5f0e8' }}
+          >
+            View Product
+          </span>
+        </div>
+
+        {/* Bottom brass line on hover — desktop only */}
+        <div
+          className="absolute bottom-0 left-0 h-px transition-all duration-500 hidden md:block"
           style={{
             width:           hovered ? '100%' : '0%',
             backgroundColor: 'var(--brass)',

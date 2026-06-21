@@ -36,8 +36,9 @@ export default function HomeProducts() {
 }
 
 function ProductRow({ product, index }: { product: Product; index: number }) {
-  const isEven = index % 2 === 0
+  const isEven   = index % 2 === 0
   const [visible, setVisible] = useState(false)
+  const [hovered, setHovered] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -48,6 +49,8 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
     if (ref.current) observer.observe(ref.current)
     return () => observer.disconnect()
   }, [])
+
+  const href = `/${product.category}/${product.slug}`
 
   return (
     <div
@@ -61,14 +64,17 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
       `}
       style={{ borderColor: 'var(--border)' }}
     >
-      {/* Image */}
-      <div
+      {/* Image — fully clickable */}
+      <Link
+        href={href}
         className={`
-          relative overflow-hidden shrink-0 w-full md:w-[44%] lg:w-[40%]
+          relative overflow-hidden shrink-0 w-full md:w-[44%] lg:w-[40%] block
           transition-all duration-1000 ease-out
           ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}
         `}
         style={{ aspectRatio: '4/5', backgroundColor: 'var(--bg-card)' }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
         {product.cover_image ? (
           <Image
@@ -85,10 +91,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
             className="absolute inset-0 flex items-center justify-center"
             style={{ backgroundColor: 'var(--bg-card)' }}
           >
-            <span
-              className="font-display text-4xl"
-              style={{ color: 'var(--text-faint)' }}
-            >
+            <span className="font-display text-4xl" style={{ color: 'var(--text-faint)' }}>
               IHE&apos;RA
             </span>
           </div>
@@ -98,16 +101,42 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
           <div className="absolute top-5 left-5">
             <span
               className="font-body text-[8px] tracking-widest uppercase px-3 py-1.5"
-              style={{
-                backgroundColor: 'var(--overlay-img)',
-                color: 'var(--brass)',
-              }}
+              style={{ backgroundColor: 'var(--overlay-img)', color: 'var(--brass)' }}
             >
               Coming Soon
             </span>
           </div>
         )}
-      </div>
+
+        {/* Mobile tap hint — always visible */}
+        <div
+          className="absolute inset-0 flex items-end justify-end p-4 md:hidden"
+          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%)' }}
+        >
+          <span
+            className="font-body text-[8px] tracking-widest uppercase px-3 py-1.5"
+            style={{ backgroundColor: 'rgba(184,146,74,0.92)', color: '#0d0d0d' }}
+          >
+            View Product →
+          </span>
+        </div>
+
+        {/* Desktop hover overlay */}
+        <div
+          className="absolute inset-0 hidden md:flex items-center justify-center transition-opacity duration-400"
+          style={{
+            backgroundColor: 'rgba(0,0,0,0.3)',
+            opacity:         hovered ? 1 : 0,
+          }}
+        >
+          <span
+            className="font-body text-[9px] tracking-widest uppercase px-6 py-3 border"
+            style={{ borderColor: 'rgba(245,240,232,0.6)', color: '#f5f0e8' }}
+          >
+            View Product
+          </span>
+        </div>
+      </Link>
 
       {/* Text */}
       <div
@@ -135,15 +164,14 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
           <span
             className="absolute font-display leading-none select-none pointer-events-none text-[8rem] md:text-[10rem]"
             style={{
-              color: 'var(--brass-ghost)',
-              top: '-3rem',
-              left: '-1rem',
+              color:      'var(--brass-ghost)',
+              top:        '-3rem',
+              left:       '-1rem',
               lineHeight: 1,
             }}
           >
             {String(index + 1).padStart(2, '0')}
           </span>
-
           <h2
             className="font-display text-4xl md:text-5xl lg:text-6xl leading-tight relative z-10"
             style={{ color: 'var(--text)' }}
@@ -169,10 +197,7 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
               <span
                 key={mat}
                 className="font-body text-[8px] tracking-widest uppercase px-3 py-1.5 border"
-                style={{
-                  color: 'var(--text-faint)',
-                  borderColor: 'var(--border-soft)',
-                }}
+                style={{ color: 'var(--text-faint)', borderColor: 'var(--border-soft)' }}
               >
                 {mat}
               </span>
@@ -181,16 +206,13 @@ function ProductRow({ product, index }: { product: Product; index: number }) {
         )}
 
         {/* CTA */}
-        <div
-          className="mt-10 pt-8 border-t"
-          style={{ borderColor: 'var(--border)' }}
-        >
+        <div className="mt-10 pt-8 border-t" style={{ borderColor: 'var(--border)' }}>
           <Link
-            href={`/${product.category}/${product.slug}`}
-            className="group inline-flex items-center gap-4 font-body text-[10px] tracking-widest uppercase transition-colors duration-300"
+            href={href}
+            className="group inline-flex items-center gap-4 font-body text-[10px] tracking-widests uppercase transition-colors duration-300"
             style={{ color: 'var(--text-muted)' }}
           >
-            <span>Discover</span>
+            <span>View Product</span>
             <span
               className="block h-px transition-all duration-500 w-8 group-hover:w-14"
               style={{ backgroundColor: 'currentColor' }}
