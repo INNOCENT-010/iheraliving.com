@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import SplashScreen from '@/components/layout/SplashScreen'
 
 export const metadata: Metadata = {
   title:       "IHE'RA — Curated Living",
@@ -38,7 +39,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="grain">{children}</body>
+      <body className="grain">
+        <SplashScreen />
+        {children}
+      </body>
     </html>
   )
 }
